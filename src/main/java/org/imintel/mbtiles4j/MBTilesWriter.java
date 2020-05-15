@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-public class MBTilesWriter {
+public class MBTilesWriter implements AutoCloseable {
 
     Connection connection;
     private File file;
@@ -61,6 +61,9 @@ public class MBTilesWriter {
         }
     }
 
+    public File getFile() {
+    		return file;
+    }
 
     private void init() throws MBTilesWriteException {
         try {
@@ -118,12 +121,13 @@ public class MBTilesWriter {
         }
     }
 
-    public File close() {
+    @Override
+	public void close() {
         try {
             connection.close();
         } catch (SQLException e) {
+        		//
         }
-        return file;
     }
 
 }

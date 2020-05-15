@@ -26,8 +26,8 @@ public class MBTileWriterTest {
         }
         tiles.close();
         reader.close();
-        File result = writer.close();
-        reader = new MBTilesReader(result);
+        writer.close();
+        reader = new MBTilesReader(writer.getFile());
         metadata = reader.getMetadata();
         assertEquals(metadata.getTilesetName(), "control_room");
         assertEquals(metadata.getTilesetType(), MetadataEntry.TileSetType.BASE_LAYER);

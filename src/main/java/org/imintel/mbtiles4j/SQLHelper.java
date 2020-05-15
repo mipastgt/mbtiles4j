@@ -4,10 +4,13 @@ import java.io.File;
 import java.sql.*;
 
 public class SQLHelper {
+	
+	public final static String DEFAULT_SQLITE_JDBC_DRIVER = "org.sqlite.JDBC";
+	
     public static Connection establishConnection(File file) throws MBTilesException {
         Connection c;
         try {
-            Class.forName("org.sqlite.JDBC");
+        	Class.forName(System.getProperty("org.imintel.mbtiles4j.sqlite_jdbc_driver", DEFAULT_SQLITE_JDBC_DRIVER));
             c = DriverManager.getConnection("jdbc:sqlite:" + file.getAbsolutePath());
         } catch (ClassNotFoundException | SQLException e) {
             throw new MBTilesException("Establish Connection failed.", e);
@@ -27,10 +30,8 @@ public class SQLHelper {
 
     private static boolean tableExists(Connection connection, String tableName) throws MBTilesException {
         String sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + tableName + "';";
-        ResultSet resultSet = executeQuery(connection, sql);
-        try {
+        try (ResultSet resultSet = executeQuery(connection, sql)) {
             boolean tableExists = resultSet.next();
-            resultSet.close();
             return tableExists;
         } catch (SQLException e) {
             throw new MBTilesException("Close Result Set", e);
@@ -69,14 +70,12 @@ public class SQLHelper {
     }
 
     public static void addTile(Connection connection, byte[] bytes, long zoom, long column, long row) throws MBTilesException {
-        try {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO tiles (zoom_level,tile_column,tile_row,tile_data) VALUES(?,?,?,?)");
+        try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO tiles (zoom_level,tile_column,tile_row,tile_data) VALUES(?,?,?,?)")) {
             stmt.setInt(1, (int) zoom);
             stmt.setInt(2, (int) column);
             stmt.setInt(3, (int) row);
             stmt.setBytes(4, bytes);
             stmt.execute();
-            stmt.close();
         } catch (SQLException e) {
             throw new MBTilesException("Add Tile failed.", e);
         }

@@ -1,21 +1,19 @@
 package org.imintel.mbtiles4j;
 
-import java.io.InputStream;
-
 public class Tile {
-    private int zoom;
-    private int column;
-    private int row;
-    private InputStream data;
+    private final int zoom;
+    private final int column;
+    private final int row;
+    private final byte[] data;
 
-    public Tile(int zoom, int column, int row, InputStream tile_data) {
+    public Tile(int zoom, int column, int row, byte[] data) {
         this.zoom = zoom;
         this.column = column;
         this.row = row;
-        this.data = tile_data;
+        this.data = data;
     }
 
-    public InputStream getData() {
+    public byte[] getData() {
         return data;
     }
 

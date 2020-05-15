@@ -18,8 +18,6 @@ under the License.
  */
 package org.imintel.mbtiles4j;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -50,13 +48,13 @@ public class TileIterator {
             int zoom = rs.getInt("zoom_level");
             int column = rs.getInt("tile_column");
             int row = rs.getInt("tile_row");
-            InputStream tile_data;
+            byte[] data;
             if (rs.getBytes(4) != null) {
-                tile_data = new ByteArrayInputStream(rs.getBytes(4));
+                data = rs.getBytes(4);
             } else {
-                tile_data = new ByteArrayInputStream(new byte[]{});
+                data = new byte[]{};
             }
-            return new Tile(zoom, column, row, tile_data);
+            return new Tile(zoom, column, row, data);
         } catch (SQLException e) {
             throw new MBTilesReadException("Read next tile", e);
         }
@@ -66,6 +64,7 @@ public class TileIterator {
         try {
             rs.close();
         } catch (SQLException e) {
+        	// Just ignore.
         }
     }
 }

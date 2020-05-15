@@ -21,7 +21,11 @@ package org.imintel.mbtiles4j;
 /**
  * A parent exception, often coming from SQL Exceptions
  */
+@SuppressWarnings("serial")
 public class MBTilesException extends Exception {
+    public MBTilesException(String msg) {
+        super(msg);
+    }
 
     public MBTilesException(Throwable e) {
         super(e);

@@ -21,7 +21,12 @@ package org.imintel.mbtiles4j;
 /**
  * An exception for Read errors
  */
+@SuppressWarnings("serial")
 public class MBTilesReadException extends MBTilesException {
+    public MBTilesReadException(String msg) {
+        super(msg);
+    }
+    
     public MBTilesReadException(Throwable e) {
         super(e);
     }

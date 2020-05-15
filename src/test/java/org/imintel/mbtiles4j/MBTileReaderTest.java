@@ -3,6 +3,7 @@ package org.imintel.mbtiles4j;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +43,7 @@ public class MBTileReaderTest {
     public void getTile() throws Exception{
     	MBTilesReader reader = new MBTilesReader(f);
     	Tile tile = reader.getTile(0, 0, 0);
-    	InputStream is = tile.getData();
+    	InputStream is = new ByteArrayInputStream(tile.getData());
     	
     	File referenceImage = new File("src/test/resources/test.png");
     	String checksumReferenceFile = getChecksum(Files.newInputStream(referenceImage.toPath()));

@@ -1,16 +1,14 @@
 package org.imintel.mbtiles4j;
 
 import java.io.File;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.imintel.mbtiles4j.model.MetadataEntry;
 
-public class MBTilesReader {
+public class MBTilesReader implements AutoCloseable {
 
-    private File f;
     private Connection connection;
 
     public MBTilesReader(File f) throws MBTilesReadException {
@@ -19,15 +17,15 @@ public class MBTilesReader {
         } catch (MBTilesException e) {
             throw new MBTilesReadException("Establish Connection to " + f.getAbsolutePath() + " failed", e);
         }
-        this.f = f;
     }
 
-    public File close() {
+    @Override
+	public void close() {
         try {
             connection.close();
         } catch (SQLException e) {
+        		//
         }
-        return f;
     }
 
     public MetadataEntry getMetadata() throws MBTilesReadException {
@@ -61,10 +59,11 @@ public class MBTilesReader {
     	
     	try {
 			ResultSet resultSet = SQLHelper.executeQuery(connection, sql);
-			InputStream tileDataInputStream = null;
-			tileDataInputStream = resultSet.getBinaryStream("tile_data");
-
-            return new Tile(zoom, column, row, tileDataInputStream);
+			if (resultSet.next()) {
+	            return new Tile(zoom, column, row, resultSet.getBytes("tile_data"));
+			} else {
+				throw new MBTilesReadException(String.format("Could not get Tile for z:%d, column:%d, row:%d", zoom, column, row));
+			}
 		} catch (MBTilesException | SQLException e) {
 			throw new MBTilesReadException(String.format("Could not get Tile for z:%d, column:%d, row:%d", zoom, column, row), e);
 		}
@@ -75,8 +74,12 @@ public class MBTilesReader {
     	
     	try {
 			ResultSet resultSet = SQLHelper.executeQuery(connection, sql);
-			return resultSet.getInt(1);
-		} catch (MBTilesException | SQLException e) {
+			if (resultSet.next()) {
+				return resultSet.getInt(1);
+			} else {
+				throw new MBTilesReadException("Could not get max zoom");
+			}
+		} catch (Exception e) {
 			throw new MBTilesReadException("Could not get max zoom", e);
 		}
     }
@@ -86,8 +89,12 @@ public class MBTilesReader {
     	
     	try {
 			ResultSet resultSet = SQLHelper.executeQuery(connection, sql);
-			return resultSet.getInt(1);
-		} catch (MBTilesException | SQLException e) {
+			if (resultSet.next()) {
+				return resultSet.getInt(1);
+			} else {
+				throw new MBTilesReadException("Could not get min zoom");
+			}
+		} catch (Exception e) {
 			throw new MBTilesReadException("Could not get min zoom", e);
 		}
     }
